@@ -1,9 +1,10 @@
-const supabase = require('../config/supabaseClient');
+const { supabase, getAuthClient } = require('../config/supabaseClient');
 
 const authMiddleware = async (req, res, next) => {
   // Ignora auth middleware no tempo de teste Jest
   if (process.env.NODE_ENV === 'test') {
     req.user = { id: 'test-user', role: 'Administrador' };
+    req.supabase = supabase; // Fallback mock client
     return next();
   }
 
@@ -38,6 +39,9 @@ const authMiddleware = async (req, res, next) => {
       email: user.email,
       role: userRoleData.role
     };
+
+    // Repassa o cliente autenticado pra dentro das rotas para o RLS funcionar
+    req.supabase = getAuthClient(token);
 
     next();
   } catch (err) {

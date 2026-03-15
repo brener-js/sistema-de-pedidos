@@ -65,7 +65,7 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await req.supabase
       .from('orders')
       .insert([{ user_id: userId, description }])
       .select()
@@ -103,7 +103,7 @@ router.get('/', authMiddleware, async (req, res) => {
   const { id: userId, role } = req.user;
 
   try {
-    let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
+    let query = req.supabase.from('orders').select('*').order('created_at', { ascending: false });
 
     // Cliente só encontra os dele, Administrador passa direto trazendo tudo
     if (role === 'Cliente') {
@@ -171,7 +171,7 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
 
   try {
     // Busca o status antigo
-    const { data: order, error: fetchError } = await supabase
+    const { data: order, error: fetchError } = await req.supabase
       .from('orders')
       .select('status')
       .eq('id', id)
@@ -184,7 +184,7 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
     const old_status = order.status;
 
     // Atualiza o pedido
-    const { error: updateError } = await supabase
+    const { error: updateError } = await req.supabase
       .from('orders')
       .update({ status: new_status })
       .eq('id', id);
@@ -192,7 +192,7 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
     if (updateError) throw updateError;
 
     // Registra  no history (Rastreabilidade)
-    const { error: historyError } = await supabase
+    const { error: historyError } = await req.supabase
       .from('status_history')
       .insert([{ order_id: id, old_status, new_status }]);
 
@@ -251,7 +251,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
   }
 
   try {
-    const { data: order, error: fetchError } = await supabase
+    const { data: order, error: fetchError } = await req.supabase
       .from('orders')
       .select('*')
       .eq('id', id)
@@ -268,7 +268,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Impossível editar. O pedido já está em andamento ou finalizado.' });
     }
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await req.supabase
       .from('orders')
       .update({ description })
       .eq('id', id);
@@ -312,7 +312,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   const { id: userId, role } = req.user;
 
   try {
-    const { data: order, error: fetchError } = await supabase
+    const { data: order, error: fetchError } = await req.supabase
       .from('orders')
       .select('*')
       .eq('id', id)
@@ -330,9 +330,9 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     }
 
     // Como o status_history tem FK cascade default ou rules, deletamos as associacoes dele antes (ou deixamos o banco lidar dependendo do sql, aqui forçamos limpar historico pra nao dar FK Error)
-    await supabase.from('status_history').delete().eq('order_id', id);
+    await req.supabase.from('status_history').delete().eq('order_id', id);
 
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await req.supabase
       .from('orders')
       .delete()
       .eq('id', id);

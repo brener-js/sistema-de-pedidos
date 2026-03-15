@@ -5,4 +5,14 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY || 'dummy-key';
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-module.exports = supabase;
+const getAuthClient = (token) => {
+  return createClient(supabaseUrl, supabaseKey, {
+    global: {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  });
+};
+
+module.exports = { supabase, getAuthClient };
