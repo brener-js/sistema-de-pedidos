@@ -53,10 +53,16 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'SGP Backend is running', timestamp: new Date() });
 });
 
-// Endpoint das Rotas de Pedidos (Protegidas pelo Middleware na própria rota)
+// Endpoint das Rotas de Pedidos (Protegidas pelo Middleware na propria rota)
 app.use('/orders', orderRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Swagger Docs available at http://localhost:${PORT}/api-docs`);
-});
+// Apenas inicia o servidor se nao estiver sendo interpelado pelo Jest
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+    console.log(`Swagger Docs available at http://localhost:${PORT}/api-docs`);
+  });
+}
+
+module.exports = app;
+
