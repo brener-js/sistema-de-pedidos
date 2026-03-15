@@ -15,8 +15,10 @@ export default function Home() {
           <Link to="/login">
             <Button size="lg" className="w-full sm:w-auto">Entrar no Sistema</Button>
           </Link>
-          <Link to="/api-docs" target="_blank">
-            <Button variant="outline" size="lg" className="w-full sm:w-auto">Ver Documentação (Swagger)</Button>
+          <Link to="https://sgp-backend-api.onrender.com/api-docs/" target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" size="lg" className="w-full sm:w-auto px-8 h-12 text-base shadow-sm hover:bg-secondary/80">
+              Ver Documentação API
+            </Button>
           </Link>
         </div>
       </div>
