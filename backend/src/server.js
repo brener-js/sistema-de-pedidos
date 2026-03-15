@@ -14,6 +14,8 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
+const path = require('path');
+
 // Swagger Options
 const swaggerOptions = {
   swaggerDefinition: {
@@ -38,7 +40,7 @@ const swaggerOptions = {
       }
     }
   },
-  apis: ['./src/routes/*.js'], // Caminho para os arquivos de rotas onde anotamos o swagger
+  apis: [path.join(__dirname, 'routes/*.js')], // Caminho absoluto
 };
 
 const swaggerDocs = swaggerJSDoc(swaggerOptions);
