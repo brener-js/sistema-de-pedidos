@@ -6,6 +6,9 @@ import { fetchWithAuth } from '@/lib/api'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
+import { Plus } from 'lucide-react'
 import OrderCard from '@/components/OrderCard'
 
 export default function Dashboard() {
@@ -15,6 +18,11 @@ export default function Dashboard() {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  // Estados Formulario de Criar Pedido
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [newOrderDescription, setNewOrderDescription] = useState("")
+  const [isCreating, setIsCreating] = useState(false)
 
   const fetchOrders = async () => {
     setLoading(true)
@@ -82,6 +90,25 @@ export default function Dashboard() {
     </div>
   )
 
+  const handleCreateOrder = async () => {
+    if (!newOrderDescription.trim()) return;
+
+    setIsCreating(true);
+    try {
+      await fetchWithAuth('/orders', {
+        method: 'POST',
+        body: JSON.stringify({ description: newOrderDescription })
+      })
+      setNewOrderDescription("")
+      setIsDialogOpen(false)
+      fetchOrders() // Relfect UI
+    } catch (err) {
+      alert("Erro ao criar pedido: " + err.message)
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Navbar Superior */}
@@ -106,9 +133,46 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
         
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 className="text-2xl font-semibold tracking-tight">Meus Pedidos</h2>
-          <Button onClick={fetchOrders} variant="secondary" size="sm">Atualizar</Button>
+          
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {userRole === 'Cliente' && (
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="w-full sm:w-auto gap-2">
+                    <Plus className="w-4 h-4" /> Novo Pedido
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Criar Novo Pedido</DialogTitle>
+                    <DialogDescription>
+                      Descreva detalhadamente os itens que você deseja solicitar.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="py-4">
+                    <Textarea 
+                      placeholder="Ex: 2x Hambúrguer da Casa, 1x Suco de Laranja..."
+                      value={newOrderDescription}
+                      onChange={(e) => setNewOrderDescription(e.target.value)}
+                      className="min-h-[120px] resize-none"
+                    />
+                  </div>
+                  <DialogFooter className="sm:justify-end">
+                    <Button type="button" variant="secondary" onClick={() => setIsDialogOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="button" variant="default" onClick={handleCreateOrder} disabled={isCreating || !newOrderDescription.trim()}>
+                      {isCreating ? 'Enviando...' : 'Confirmar Pedido'}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
+
+            <Button onClick={fetchOrders} variant="secondary" size="sm" className="w-full sm:w-auto">Atualizar</Button>
+          </div>
         </div>
 
         {error && (

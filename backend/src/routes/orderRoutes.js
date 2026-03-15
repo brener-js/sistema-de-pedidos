@@ -205,4 +205,145 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /orders/{id}:
+ *   put:
+ *     summary: Edita a descrição de um pedido existente (Apenas o Cliente dono)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID (UUID) do pedido
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - description
+ *             properties:
+ *               description:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Pedido editado com sucesso
+ *       400:
+ *         description: O pedido não pode ser alterado pois não está Pendente
+ *       403:
+ *         description: Você não tem permissão para editar este pedido
+ *       404:
+ *         description: Pedido não encontrado
+ */
+router.put('/:id', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { description } = req.body;
+  const { id: userId, role } = req.user;
+
+  if (!description) {
+    return res.status(400).json({ error: 'A descriçāo é obrigatória' });
+  }
+
+  try {
+    const { data: order, error: fetchError } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !order) return res.status(404).json({ error: 'Pedido nâo encontrado' });
+
+    // Regras de Negócio de Ediçāo
+    if (role !== 'Administrador' && order.user_id !== userId) {
+      return res.status(403).json({ error: 'Acesso Negado: Este pedido pertence a outro usuário' });
+    }
+
+    if (order.status !== 'Pendente') {
+      return res.status(400).json({ error: 'Impossível editar. O pedido já está em andamento ou finalizado.' });
+    }
+
+    const { error: updateError } = await supabase
+      .from('orders')
+      .update({ description })
+      .eq('id', id);
+
+    if (updateError) throw updateError;
+
+    res.status(200).json({ message: 'Pedido atualizado com sucesso' });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * @swagger
+ * /orders/{id}:
+ *   delete:
+ *     summary: Exclui/Cancela um pedido (Apenas o Cliente dono)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID (UUID) do pedido
+ *     responses:
+ *       200:
+ *         description: Pedido deletado com sucesso
+ *       400:
+ *         description: Pedido não pode ser deletado pois já começou a ser preparado
+ *       403:
+ *         description: Você não tem permissão
+ *       404:
+ *         description: Pedido não encontrado
+ */
+router.delete('/:id', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { id: userId, role } = req.user;
+
+  try {
+    const { data: order, error: fetchError } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !order) return res.status(404).json({ error: 'Pedido nāo encontrado' });
+
+    // Regras de Negócio de Exclusão
+    if (role !== 'Administrador' && order.user_id !== userId) {
+      return res.status(403).json({ error: 'Acesso Negado: Este pedido pertence a outro usuário' });
+    }
+
+    if (order.status !== 'Pendente') {
+      return res.status(400).json({ error: 'Impossível excluir. O pedido já está em andamento ou finalizado.' });
+    }
+
+    // Como o status_history tem FK cascade default ou rules, deletamos as associacoes dele antes (ou deixamos o banco lidar dependendo do sql, aqui forçamos limpar historico pra nao dar FK Error)
+    await supabase.from('status_history').delete().eq('order_id', id);
+
+    const { error: deleteError } = await supabase
+      .from('orders')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) throw deleteError;
+
+    res.status(200).json({ message: 'Pedido deletado com sucesso' });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
