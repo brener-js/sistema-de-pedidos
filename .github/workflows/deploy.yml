@@ -3,10 +3,10 @@ name: CI/CD Pipeline - Sistema de Pedidos (SGP)
 on:
   push:
     branches:
-      - main
+      - setup-infraestrutura
   pull_request:
     branches:
-      - main
+      - setup-infraestrutura
 
 jobs:
   test-and-build:
@@ -36,7 +36,7 @@ jobs:
   #   name: Trigger Render & Vercel Deploy Hook
   #   needs: test-and-build
   #   runs-on: ubuntu-latest
-  #   if: github.ref == 'refs/heads/main'
+  #   if: github.ref == 'refs/heads/setup-infraestrutura'
   #   steps:
   #     - name: Trigger Backend Deploy on Render
   #       run: curl -s -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
