@@ -12,7 +12,7 @@ export default function Dashboard() {
   const { session, userRole } = useAuth()
   const navigate = useNavigate()
   
-  const [orders, setOrders] =建设Orders] = useState([])
+  const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
