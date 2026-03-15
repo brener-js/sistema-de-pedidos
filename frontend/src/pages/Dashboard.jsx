@@ -31,8 +31,37 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchOrders()
-  }, []) // Runs once on mount (meaning auth is already resolved by PrivateRoute)
 
+    // Inscreve no canal de websockets para mudanças em tempo real na tabela 'orders'
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+        },
+        (payload) => {
+          // Quando ocorre a mudança ("Enviado", "Em Preparo", etc)
+          const updatedOrder = payload.new
+
+          setOrders((currentOrders) => 
+            currentOrders.map((order) => 
+              order.id === updatedOrder.id 
+                ? { ...order, status: updatedOrder.status }
+                : order
+            )
+          )
+        }
+      )
+      .subscribe()
+
+    // Limpa a inscrição quando o componente é destruído
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, []) // Runs once on mount
   const handleLogout = async () => {
     await supabase.auth.signOut()
     navigate('/')
