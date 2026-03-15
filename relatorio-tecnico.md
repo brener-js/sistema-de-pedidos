@@ -140,6 +140,4 @@ Os URLs dos Deploy Hooks são armazenados como **GitHub Secrets** (`RENDER_DEPLO
 - **Causa**: O caminho `'./src/routes/*.js'` usado pelo `swagger-jsdoc` era relativo ao diretório de trabalho (CWD), que difere entre ambientes locais e containers Docker.
 - **Solução**: Uso de `path.join(__dirname, 'routes/*.js')` para resolver o caminho de forma absoluta, independente do ambiente de execução.
 
----
 
-*Relatório gerado em 15 de Março de 2026 — Projeto SGP v1.0*
