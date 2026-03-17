@@ -141,3 +141,8 @@ Os URLs dos Deploy Hooks são armazenados como **GitHub Secrets** (`RENDER_DEPLO
 - **Solução**: Uso de `path.join(__dirname, 'routes/*.js')` para resolver o caminho de forma absoluta, independente do ambiente de execução.
 
 
+## 5. Diagrama de Arquitetura em Nuvem 
+
+Abaixo está a representação visual da arquitetura do Sistema de Gestão de Pedidos (SGP), ilustrando a integração entre os serviços de nuvem, o ambiente de contêineres e o pipeline de CI/CD:
+
+![Diagrama de Arquitetura em Nuvem](./diagrama_projeto_cloud.jpg)
