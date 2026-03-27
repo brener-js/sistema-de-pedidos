@@ -146,3 +146,24 @@ Os URLs dos Deploy Hooks são armazenados como **GitHub Secrets** (`RENDER_DEPLO
 Abaixo está a representação visual da arquitetura do Sistema de Gestão de Pedidos (SGP), ilustrando a integração entre os serviços de nuvem, o ambiente de contêineres e o pipeline de CI/CD:
 
 ![Diagrama de Arquitetura em Nuvem](./diagrama_projeto_cloud.jpg)
+
+
+## 6. Formação da Equipe e Responsabilidades
+
+| Integrante | Papel Técnico |
+| :--- | :--- |
+| **Erycles de Sousa** | Arquiteto(a) de Software em Nuvem |
+| **Sérgio Brener da Silva Evangelista** | Desenvolvedor(a) Back-end |
+| **Lucas Bastos do Nascimento** | Desenvolvedor(a) Front-end |
+| **Felipe Yash Lemos Patwardhan** | Engenheiro(a) DevOps |
+| **Thiago Verçosa Soares** | Responsável por Qualidade e Testes |
+| **Fabio Arimateia Gomes** | Documentação e Integração |
+
+### Detalhamento das Contribuições
+
+* **Erycles de Sousa (Arquiteto de Software em Nuvem):** Responsável pelo desenho da topologia da solução em nuvem e seleção dos provedores de serviço (Vercel, Render e Supabase).
+* **Sérgio Brener da Silva Evangelista (Desenvolvedor Back-end):** Implementou a API RESTful e estruturou o ambiente de containers com Docker.
+* **Lucas Bastos do Nascimento (Desenvolvedor Front-end):** Desenvolveu a interface em React e garantiu a integração com os serviços de nuvem.
+* **Felipe Yash Lemos Patwardhan (Engenheiro DevOps):** Estruturou o pipeline de CI/CD via GitHub Actions e gerenciou os deploys automatizados.
+* **Thiago Verçosa Soares (Responsável por Qualidade e Testes):** Implementou os testes automatizados de API com Jest e Supertest.
+* **Fabio Arimateia Gomes (Documentação e Integração):** Responsável pela documentação Swagger e redação do relatório técnico.
