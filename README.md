@@ -79,3 +79,9 @@ npm run dev
 ```
 
 > **Aviso de Acesso para Desenvolvimento Rápido**: O projeto Frontend vai subir na porta de host comum do Vite. Acesse a tela, clique em "Criar Conta". Você pode simular o "Administrador mestre" alterando sua flag de status na aba Supabase > *SQL Editor* / *Table Editor* da public.users.
+
+---
+
+## 🚀 Deploy em Produção
+
+Para instruções completas de como configurar os serviços em nuvem (Supabase, Render, Vercel) e o pipeline CI/CD com GitHub Actions, consulte o **[Guia de Deploy](./DEPLOY.md)**.
